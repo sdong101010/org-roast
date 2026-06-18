@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "html-to-image": "^1.11.13",
+    "iron-session": "^8.0.4",
+    "jsforce": "^3.10.14",
     "next": "16.2.2",
     "react": "19.2.4",
     "react-dom": "19.2.4"

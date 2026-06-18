@@ -1,26 +1,318 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #06060c;
+  --foreground: #e4e4e7;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-syne);
+  --font-sans: var(--font-dm-sans);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Cypher palette */
+  --color-cyan: #00f5ff;
+  --color-purple: #7c3aed;
+  --color-pink: #ff3366;
+  --color-gold: #ffd700;
+  --color-neon-green: #39ff14;
+  --color-text-dim: #71717a;
+  --color-text-faint: #3f3f46;
+  --color-glass-bg: rgba(255, 255, 255, 0.025);
+  --color-glass-border: rgba(255, 255, 255, 0.06);
+  --color-glass-hover: rgba(255, 255, 255, 0.055);
+
+  --radius-card: 20px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .aurora-blob,
+  .cursor-dot,
+  .graf-mark {
+    animation: none !important;
+  }
+
+  .aurora-blob { opacity: 1; }
+  .graf-mark { opacity: var(--final-opacity, 0.05); }
+
+  .text-gradient,
+  .animate-gradient-shift {
+    animation: none !important;
+  }
+
+  .cta-btn::before {
+    animation: none !important;
+  }
+
+  .animate-flame,
+  .animate-border-rotate {
+    animation: none !important;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* ── Keyframes ────────────────────────────────────── */
+
+@keyframes drift-1 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(120px, 80px) scale(1.15); }
+}
+@keyframes drift-2 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-100px, 60px) scale(1.1); }
+}
+@keyframes drift-3 {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(80px, -60px) scale(1.2); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes letter-reveal {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes border-rotate {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+@keyframes graf-fade {
+  to { opacity: var(--final-opacity, 0.05); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes typewriter-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.1) rotate(-2deg); }
+  75% { transform: scale(0.95) rotate(2deg); }
+}
+
+@keyframes eq-bar {
+  0%, 100% { height: 6px; }
+  50% { height: 20px; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.1); opacity: 0.3; }
+  100% { transform: scale(0.9); opacity: 0.6; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Utility classes ──────────────────────────────── */
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out forwards;
+}
+
+.animate-typewriter-cursor {
+  animation: typewriter-cursor 0.8s steps(1) infinite;
+}
+
+.animate-flame {
+  animation: flame-flicker 0.5s ease-in-out infinite;
+}
+
+.animate-gradient-shift {
+  animation: gradient-shift 10s ease infinite;
+}
+
+.animate-border-rotate {
+  animation: border-rotate 5s linear infinite;
+}
+
+/* ── Aurora background blobs ──────────────────────── */
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ── Glass card ───────────────────────────────────── */
+
+.glass-card {
+  position: relative;
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--color-glass-border);
+  border-radius: var(--radius-card);
+  transition: all 0.4s ease;
+}
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(0, 245, 255, 0.06),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.glass-card:hover::before { opacity: 1; }
+.glass-card:hover {
+  background: var(--color-glass-hover);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+}
+
+/* ── CTA button with animated gradient border ─────── */
+
+.cta-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 2.8rem;
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #00f5ff;
+  background: rgba(0, 245, 255, 0.05);
+  border: none;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, #00f5ff, #7c3aed, #ff3366, #00f5ff);
+  background-size: 300% 300%;
+  animation: border-rotate 5s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.cta-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 0 50px rgba(0, 245, 255, 0.15), 0 0 100px rgba(124, 58, 237, 0.1);
+  background: rgba(0, 245, 255, 0.08);
+}
+.cta-btn:active { transform: scale(0.97); }
+.cta-btn-lg {
+  font-size: 1.15rem;
+  padding: 1.2rem 3.2rem;
+}
+
+/* ── Graffiti mark base ───────────────────────────── */
+
+.graf-mark {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  animation: graf-fade 2s ease forwards;
+}
+
+/* ── Scroll reveal ────────────────────────────────── */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Gradient text helper ─────────────────────────── */
+
+.text-gradient {
+  background: linear-gradient(135deg, #00f5ff 0%, #fff 30%, #7c3aed 60%, #ff3366 80%, #00f5ff 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 10s ease infinite;
+}
+
+/* ── Toggle ───────────────────────────────────────── */
+
+/* ── Custom dot cursor ─────────────────────────────── */
+
+.cursor-dot {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00f5ff;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.15s ease, background 0.2s ease;
+  box-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
+}
+.cursor-dot.hovering {
+  transform: translate(-50%, -50%) scale(2.2);
+  background: #fff;
+  box-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
+}
+
+a, button, label, .toggle-track, .cta-btn { cursor: none; }
+body { cursor: none; }
+
+/* ── Toggle ───────────────────────────────────────── */
+
+.toggle-track {
+  width: 42px; height: 24px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.3s;
+}
+.toggle-track.active { background: rgba(0, 245, 255, 0.2); border-color: rgba(0,245,255,0.3); }
