@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Link from "next/link";
 import Aurora from "@/components/Aurora";
+import { IS_DEMO } from "@/lib/api-client";
 import AnalyzingSpinner from "@/components/AnalyzingSpinner";
 import OrgScore from "@/components/OrgScore";
 import RoastCard from "@/components/RoastCard";
@@ -150,13 +152,15 @@ export default function RoastPage() {
               >
                 Try Again
               </button>
-              <a
-                href="/"
-                className="px-6 py-3 rounded-full text-sm font-display font-bold tracking-wide uppercase
-                           border border-white/[0.06] text-text-dim hover:text-foreground hover:border-white/[0.12] transition-all"
-              >
-                Back Home
-              </a>
+              {!IS_DEMO && (
+                <Link
+                  href="/"
+                  className="px-6 py-3 rounded-full text-sm font-display font-bold tracking-wide uppercase
+                             border border-white/[0.06] text-text-dim hover:text-foreground hover:border-white/[0.12] transition-all"
+                >
+                  Back Home
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -248,12 +252,14 @@ export default function RoastPage() {
           )}
 
           {/* Actions */}
-          <div className="flex justify-center pt-4 pb-8">
-            <a href="/" className="cta-btn !text-sm" style={{ opacity: 1, animation: "none" }}>
-              <span>🎤</span>
-              Roast Another Org
-            </a>
-          </div>
+          {!IS_DEMO && (
+            <div className="flex justify-center pt-4 pb-8">
+              <Link href="/" className="cta-btn !text-sm" style={{ opacity: 1, animation: "none" }}>
+                <span>🎤</span>
+                Roast Another Org
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
