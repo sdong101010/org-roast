@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Finding } from "@/lib/analyzers/types";
+import { fetchFixPlanStream } from "@/lib/api-client";
 
 const EFFORT_COLORS: Record<string, string> = {
   "QUICK WIN": "#39ff14",
@@ -30,17 +31,8 @@ export default function FixPlan({ findings }: { findings: Finding[] }) {
     setPlanText("");
 
     try {
-      const res = await fetch("/api/fix-plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ findings }),
-      });
-
-      if (!res.ok) throw new Error("Fix plan generation failed");
-
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response stream");
-
+      const stream = await fetchFixPlanStream(findings);
+      const reader = stream.getReader();
       const decoder = new TextDecoder();
       let fullText = "";
 

@@ -13,6 +13,7 @@ import SlackShareButton from "@/components/SlackShareButton";
 import FixPlan from "@/components/FixPlan";
 import { Finding } from "@/lib/analyzers/types";
 import { OrgGrade } from "@/lib/score";
+import { analyzeOrg, fetchRoastStream, fetchRoastAudio } from "@/lib/api-client";
 
 type Stage = "analyzing" | "score" | "review" | "streaming" | "error";
 type RoastBuild = "idle" | "building" | "ready" | "failed";
@@ -62,16 +63,8 @@ export default function RoastPage() {
     setRoastAudioReady(false);
 
     try {
-      const roastRes = await fetch("/api/roast", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ findings: foundFindings }),
-      });
-
-      if (!roastRes.ok) throw new Error("Roast generation failed");
-
-      const reader = roastRes.body?.getReader();
-      if (!reader) throw new Error("No response stream");
+      const roastStream = await fetchRoastStream(foundFindings);
+      const reader = roastStream.getReader();
 
       const decoder = new TextDecoder();
       let fullText = "";
@@ -81,15 +74,7 @@ export default function RoastPage() {
         fullText += decoder.decode(value, { stream: true });
       }
 
-      const speakRes = await fetch("/api/speak", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: fullText }),
-      });
-
-      if (!speakRes.ok) throw new Error("Audio generation failed");
-
-      const blob = await speakRes.blob();
+      const blob = await fetchRoastAudio(fullText);
       roastAudioUrlRef.current = URL.createObjectURL(blob);
       roastTextRef.current = fullText;
       setRoastText(fullText);
@@ -117,13 +102,7 @@ export default function RoastPage() {
     try {
       setStage("analyzing");
 
-      const analyzeRes = await fetch("/api/analyze");
-      if (!analyzeRes.ok) {
-        const data = await analyzeRes.json();
-        throw new Error(data.error || "Analysis failed");
-      }
-
-      const { findings: foundFindings, grade: orgGrade } = await analyzeRes.json();
+      const { findings: foundFindings, grade: orgGrade } = await analyzeOrg();
       setFindings(foundFindings);
       setGrade(orgGrade);
       setStage("score");

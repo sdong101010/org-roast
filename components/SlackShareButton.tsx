@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Finding } from "@/lib/analyzers/types";
 import { OrgGrade } from "@/lib/score";
+import { IS_DEMO, postToSlack } from "@/lib/api-client";
 
 export default function SlackShareButton({
   grade,
@@ -13,35 +14,32 @@ export default function SlackShareButton({
 }) {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error" | "unavailable">("idle");
 
+  useEffect(() => {
+    if (IS_DEMO) setState("unavailable");
+  }, []);
+
   const handleShare = useCallback(async () => {
     setState("sending");
-    try {
-      const res = await fetch("/api/share-slack", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          score: grade.score,
-          letter: grade.letter,
-          label: grade.label,
-          findings: findings.map((f) => ({
-            category: f.category,
-            title: f.title,
-            severity: f.severity,
-          })),
-        }),
-      });
-
-      if (res.status === 501) {
-        setState("unavailable");
-        return;
-      }
-
-      if (!res.ok) throw new Error();
-      setState("sent");
-    } catch {
+    const result = await postToSlack({
+      score: grade.score,
+      letter: grade.letter,
+      label: grade.label,
+      findings: findings.map((f) => ({
+        category: f.category,
+        title: f.title,
+        severity: f.severity,
+      })),
+    });
+    if (result === "unavailable") {
+      setState("unavailable");
+      return;
+    }
+    if (result === "error") {
       setState("error");
       setTimeout(() => setState("idle"), 3000);
+      return;
     }
+    setState("sent");
   }, [grade, findings]);
 
   if (state === "unavailable") return null;

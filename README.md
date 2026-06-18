@@ -2,6 +2,8 @@
 
 A web app that logs into your Salesforce org, analyzes it across 5 dimensions, and delivers a savage rap-diss style roast of the worst things it finds.
 
+**Live demo: https://sdong101010.github.io/org-roast/** — plays a canned roast against a fake org so anyone can see what it looks like. Run it yourself locally to point it at a real org.
+
 ## What Gets Roasted
 
 | Category | What We Check |

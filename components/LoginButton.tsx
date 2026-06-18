@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { IS_DEMO } from "@/lib/api-client";
 
 export default function LoginButton({ variant = "default" }: { variant?: "default" | "large" }) {
   const [isSandbox, setIsSandbox] = useState(false);
 
   const handleLogin = () => {
+    if (IS_DEMO) {
+      const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+      window.location.href = `${base}/roast`;
+      return;
+    }
     const url = `/api/auth/login${isSandbox ? "?sandbox=true" : ""}`;
     window.location.href = url;
   };
@@ -20,9 +26,10 @@ export default function LoginButton({ variant = "default" }: { variant?: "defaul
         style={isLarge ? { opacity: 1, animation: "none" } : undefined}
       >
         <span className="text-xl">{isLarge ? "🔥" : "🎤"}</span>
-        Enter The Cypher
+        {IS_DEMO ? "See The Demo" : "Enter The Cypher"}
       </button>
 
+      {!IS_DEMO && (
       <div className="flex items-center justify-center gap-3">
         <span className="text-xs font-medium tracking-[0.12em] uppercase text-text-dim">
           Production
@@ -48,6 +55,7 @@ export default function LoginButton({ variant = "default" }: { variant?: "defaul
           Sandbox
         </span>
       </div>
+      )}
     </div>
   );
 }

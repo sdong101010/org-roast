@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Salesforce CLI local source tracking
 .sf/
+out/

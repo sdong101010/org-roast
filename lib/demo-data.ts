@@ -73,6 +73,16 @@ export const DEMO_FINDINGS: Finding[] = [
   },
 ];
 
+export const DEMO_FIX_PLAN = `[QUICK WIN] Write Apex Tests — Open Developer Console, run uncovered classes through Setup > Apex Test Execution. Target 85%+ starting with trigger handlers.
+
+[MEDIUM] Bulkify SOQL in Loops — Refactor the 12 flagged classes to collect IDs into Sets, query once outside the loop, and use Maps for lookups.
+
+[MEDIUM] Consolidate Admins — Create a custom "Power User" profile cloning System Admin with reduced permissions. Reassign 18 of 21 admins to it via Setup > Users.
+
+[LARGE] Migrate to Flows — Use Setup > Migrate to Flow to convert Process Builders. Consolidate per-object into single Record-Triggered Flows with Before/After contexts.
+
+[QUICK WIN] Enable Agentforce — Spin up a Service Agent from Setup > Agentforce. Start with the standard case-routing topic and FAQ action — takes under an hour.`;
+
 /** Verbatim-ish transcript of `public/demo-roast.mp3` (must match spoken demo track). */
 export const DEMO_ROAST = `Yo, I'm here to spit facts.
 This org is a fright, 0% Apex.

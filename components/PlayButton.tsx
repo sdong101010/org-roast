@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import { fetchRoastAudio } from "@/lib/api-client";
 
 export default function PlayButton({ roastText }: { roastText: string }) {
   const [state, setState] = useState<"idle" | "loading" | "playing" | "error">("idle");
@@ -23,15 +24,7 @@ export default function PlayButton({ roastText }: { roastText: string }) {
     setState("loading");
 
     try {
-      const res = await fetch("/api/speak", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: roastText }),
-      });
-
-      if (!res.ok) throw new Error("TTS request failed");
-
-      const blob = await res.blob();
+      const blob = await fetchRoastAudio(roastText);
       const url = URL.createObjectURL(blob);
       blobUrlRef.current = url;
       playAudio(url);
